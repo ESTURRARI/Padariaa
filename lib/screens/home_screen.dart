@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(12),
                           // Responsivo: quantidade de colunas se adapta à largura da tela
                           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 220, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.1),
+                              maxCrossAxisExtent: 220, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.85),
                           itemCount: lista.length,
                           itemBuilder: (_, i) {
                             final p = lista[i];

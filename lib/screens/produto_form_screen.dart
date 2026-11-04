@@ -14,6 +14,7 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
   late final _nome = TextEditingController(text: widget.produto?.nome);
   late final _preco = TextEditingController(text: widget.produto?.preco.toString());
   late final _desc = TextEditingController(text: widget.produto?.descricao);
+  late final _img = TextEditingController(text: widget.produto?.imagem);
   late String _categoria = widget.produto?.categoria ?? 'pao';
   late bool _promo = widget.produto?.promocao ?? false;
   bool _salvando = false;
@@ -27,6 +28,7 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
       'categoria': _categoria,
       'preco': double.parse(_preco.text.replaceAll(',', '.')),
       'descricao': _desc.text.trim(),
+      'imagem': _img.text.trim(),
       'promocao': _promo,
     });
     try {
@@ -68,6 +70,8 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(controller: _desc, decoration: const InputDecoration(labelText: 'Descrição', border: OutlineInputBorder())),
+                  const SizedBox(height: 12),
+                  TextFormField(controller: _img, decoration: const InputDecoration(labelText: 'Link da imagem (opcional)', border: OutlineInputBorder())),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: _categoria,
