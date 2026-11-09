@@ -7,7 +7,7 @@ abstract class Produto {
   final double preco;
   final String descricao;
   final bool promocao;
-  final String imagem; // link da imagem (opcional)
+  final String imagem; // link ou foto (base64), opcional
 
   Produto({this.id, required this.nome, required this.preco, this.descricao = '', this.promocao = false, this.imagem = ''});
 

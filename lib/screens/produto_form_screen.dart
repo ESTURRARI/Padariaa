@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/produto.dart';
 import '../services/api_service.dart';
+import '../widgets/produto_imagem.dart';
 
 class ProdutoFormScreen extends StatefulWidget {
   final Produto? produto; // null = novo (POST); preenchido = edição (PUT)
@@ -14,10 +17,55 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
   late final _nome = TextEditingController(text: widget.produto?.nome);
   late final _preco = TextEditingController(text: widget.produto?.preco.toString());
   late final _desc = TextEditingController(text: widget.produto?.descricao);
-  late final _img = TextEditingController(text: widget.produto?.imagem);
+  late final _img = TextEditingController(
+      text: (widget.produto?.imagem.startsWith('data:') ?? false) ? '' : widget.produto?.imagem);
   late String _categoria = widget.produto?.categoria ?? 'pao';
   late bool _promo = widget.produto?.promocao ?? false;
+  String? _foto; // foto escolhida no aparelho (guardada como texto base64)
   bool _salvando = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final i = widget.produto?.imagem ?? '';
+    if (i.startsWith('data:')) _foto = i;
+  }
+
+  Future<void> _escolherFoto(ImageSource origem) async {
+    try {
+      // reduz o tamanho da foto para o app continuar rápido
+      final x = await ImagePicker().pickImage(source: origem, maxWidth: 700, imageQuality: 70);
+      if (x == null) return;
+      final bytes = await x.readAsBytes();
+      setState(() => _foto = 'data:image/jpeg;base64,${base64Encode(bytes)}');
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Não foi possível abrir a foto: $e')));
+    }
+  }
+
+  void _menuFoto() => showModalBottomSheet(
+        context: context,
+        builder: (_) => SafeArea(
+          child: Wrap(children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Escolher da galeria'),
+              onTap: () {
+                Navigator.pop(context);
+                _escolherFoto(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Tirar uma foto'),
+              onTap: () {
+                Navigator.pop(context);
+                _escolherFoto(ImageSource.camera);
+              },
+            ),
+          ]),
+        ),
+      );
 
   Future<void> _salvar() async {
     if (!_chave.currentState!.validate()) return;
@@ -28,7 +76,7 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
       'categoria': _categoria,
       'preco': double.parse(_preco.text.replaceAll(',', '.')),
       'descricao': _desc.text.trim(),
-      'imagem': _img.text.trim(),
+      'imagem': _foto ?? _img.text.trim(),
       'promocao': _promo,
     });
     try {
@@ -53,6 +101,34 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
               child: Form(
                 key: _chave,
                 child: Column(children: [
+                  if (_foto != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: ProdutoImagem(
+                        produto: Produto.fromJson({'nome': 'x', 'categoria': _categoria, 'preco': 1, 'imagem': _foto}),
+                        altura: 180,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  Row(children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.add_a_photo),
+                        label: Text(_foto == null ? 'Adicionar foto' : 'Trocar foto'),
+                        onPressed: _menuFoto,
+                      ),
+                    ),
+                    if (_foto != null) ...[
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.delete_outline),
+                        label: const Text('Remover'),
+                        onPressed: () => setState(() => _foto = null),
+                      ),
+                    ],
+                  ]),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _nome,
                     decoration: const InputDecoration(labelText: 'Nome', border: OutlineInputBorder()),
@@ -71,7 +147,10 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
                   const SizedBox(height: 12),
                   TextFormField(controller: _desc, decoration: const InputDecoration(labelText: 'Descrição', border: OutlineInputBorder())),
                   const SizedBox(height: 12),
-                  TextFormField(controller: _img, decoration: const InputDecoration(labelText: 'Link da imagem (opcional)', border: OutlineInputBorder())),
+                  TextFormField(
+                    controller: _img,
+                    decoration: const InputDecoration(labelText: 'Ou link de uma imagem (opcional)', border: OutlineInputBorder()),
+                  ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: _categoria,
@@ -89,7 +168,7 @@ class _ProdutoFormScreenState extends State<ProdutoFormScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _salvando ? null : _salvar,
-                      child: _salvando ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Salvar'),
+                      child: _salvando ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Salvar'),
                     ),
                   ),
                 ]),
