@@ -1,190 +1,339 @@
-# 🫐 Amora Bakery — Aplicativo Mobile (Flutter + Dart)
 
-Aplicativo de padaria e café desenvolvido para a **Avaliação Somativa PPDM — SENAI "Roberto Mange"**
-(Situação Desafiadora: *Do Zero ao App Integrado*, agência "Digital Horizon").
+# 🫐 Amora Bakery — Aplicativo Mobile
 
-O app apresenta o cardápio e as promoções da padaria e permite que o cliente monte um carrinho e
-faça pedidos para **entrega** ou **retirada**. O administrador gerencia os produtos e acompanha os pedidos.
+Aplicativo de uma padaria e cafeteria desenvolvido em **Flutter e Dart**, como parte da Avaliação Somativa de PPDM do SENAI "Roberto Mange".
 
----
-
-## 📌 Funcionalidades
-
-### 👤 Cliente
-- Criar conta e entrar (a sessão fica salva no aparelho)
-- Ver o cardápio, buscar por nome e filtrar por categoria (Pães, Doces, Bebidas)
-- Favoritar produtos
-- Adicionar ao carrinho, alterar quantidades e finalizar o pedido
-- Escolher **Entrega** (informando o endereço, com preenchimento automático pelo CEP) ou **Retirada** no balcão
-- Acompanhar o histórico e o status dos próprios pedidos
-- Ver o cardápio mesmo **sem internet** (dados em cache)
-
-### 🛠️ Administrador
-- Adicionar, editar e excluir produtos (nome, categoria, preço, descrição, promoção e **foto** pela galeria/câmera ou link)
-- Ver **todos os pedidos**, com nome, telefone e e-mail de quem pediu, tipo (entrega/retirada), endereço e itens
-- Alterar o status do pedido (novo → preparando → pronto → entregue / cancelado)
+O objetivo do projeto é facilitar a experiência dos clientes, permitindo consultar o cardápio, escolher produtos e realizar pedidos pelo próprio aplicativo. Além disso, o sistema possui uma área administrativa para que o responsável pela padaria possa gerenciar os produtos e acompanhar os pedidos recebidos.
 
 ---
 
-## 🧱 Tecnologias
+# ▶️ Como executar o projeto
 
-| Parte | Tecnologia |
-|---|---|
-| App | Flutter / Dart |
-| Servidor (API REST) | Python 3 (somente biblioteca padrão) |
-| Banco de dados externo | SQLite (`backend/padaria.db`) |
-| Bibliotecas do app | `http`, `shared_preferences`, `flutter_secure_storage`, `image_picker` |
-| API pública consumida | ViaCEP (busca de endereço pelo CEP) |
+## Pré-requisitos
 
----
+Antes de começar, verifique se você tem os seguintes programas instalados:
 
-## 📁 Estrutura do projeto
+- Python 3;
+- Flutter SDK;
+- VS Code;
+- Extensões Flutter e Dart no VS Code.
 
-```
-padaria/
-├── backend/
-│   └── server.py              # API REST + banco SQLite
-├── lib/
-│   ├── main.dart              # Início do app (restaura a sessão ou mostra o login)
-│   ├── theme.dart             # Paleta de cores (café + amora)
-│   ├── models/                # Produto (Pao, Doce, Bebida), Usuario (Cliente, Administrador), Pedido
-│   ├── services/              # api_service, local_storage, carrinho, cep_service
-│   ├── screens/               # login, home, detalhe, produto_form, carrinho, pedidos
-│   └── widgets/               # produto_card, produto_imagem, rodape, logo, aviso_offline, servidor
-├── assets/
-│   └── logo.png               # Logo da Amora Bakery
-├── android/ · web/            # Pastas geradas pelo Flutter
-└── pubspec.yaml               # Dependências e assets
-```
+Para verificar se o Flutter está configurado corretamente, execute `flutter doctor` no terminal.
 
----
+## 1. Iniciar o servidor
 
-## ▶️ Como executar
+Abra um terminal na pasta do projeto e execute:
 
-### Pré-requisitos
-- **Python 3** instalado
-- **Flutter SDK** instalado e no PATH (`flutter doctor` sem erros no item Flutter)
-- VS Code com os plugins **Flutter** e **Dart**
-
-### 1. Ligar o servidor (deixe esse terminal aberto)
-```
+```bash
 cd backend
 python server.py
 ```
-O servidor mostra no terminal o endereço para o computador (`http://localhost:8000`) e para o celular na mesma rede.
-Na primeira execução, o banco é criado automaticamente com produtos de exemplo e o usuário administrador.
 
-### 2. Rodar o app (em outro terminal, na pasta `padaria`)
-```
+O servidor será iniciado na porta 8000. No terminal, serão exibidos os endereços para acessar a API pelo computador e por outros dispositivos conectados à mesma rede.
+
+Na primeira execução, o sistema cria automaticamente o banco de dados `padaria.db`, incluindo alguns produtos de exemplo e a conta de administrador.
+
+**Importante:** mantenha esse terminal aberto enquanto estiver utilizando o aplicativo.
+
+## 2. Preparar e executar o aplicativo
+
+Abra outro terminal, agora na pasta principal do projeto, e execute:
+
+```bash
 flutter pub get
+```
+
+Esse comando instala as dependências necessárias.
+
+Em seguida, para abrir o aplicativo no navegador:
+
+```bash
 flutter run -d chrome
 ```
-Para rodar em emulador ou celular Android conectado: `flutter run`.
 
-### 🔑 Acesso
+Caso queira executar em um emulador ou celular Android conectado ao computador:
 
-| Perfil | Como entrar |
+```bash
+flutter run
+```
+
+## 3. Acessos ao aplicativo
+
+O sistema possui dois tipos de usuários: **cliente e administrador**.
+
+### Administrador
+
+A conta administrativa já vem cadastrada no banco de dados na primeira execução. Portanto, não é necessário criar uma conta para esse perfil.
+
+| Campo | Acesso |
 |---|---|
-| **Administrador** | e-mail `admin@amora.com` — senha `admin123` |
-| **Cliente** | tela de login → **Criar conta de cliente** |
+| E-mail | admin@amora.com |
+| Senha | admin123 |
 
-> A senha do administrador pode ser trocada em `backend/server.py` (constante `ADMIN_SENHA`)
-> antes da primeira execução (apague o `padaria.db` para recriar o banco).
+### Cliente
+
+Para acessar como cliente, basta abrir a tela de login e selecionar a opção **Criar conta de cliente**.
+
+O próprio usuário realiza seu cadastro, informando seus dados e escolhendo uma senha. Depois disso, poderá utilizar o e-mail e a senha cadastrados para entrar no aplicativo.
+
+Cada cliente possui sua própria conta e consegue visualizar somente os pedidos realizados por ele.
+
+## 4. Gerar o APK para Android
+
+Também é possível gerar uma versão instalável do aplicativo para celulares Android.
+
+Antes de gerar o arquivo, confira as configurações:
+
+No arquivo `android/app/src/main/AndroidManifest.xml`:
+
+- Antes da tag `<application>`, deve existir a permissão de internet:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+- Dentro da tag `<application>`, deve existir:
+
+```xml
+android:usesCleartextTraffic="true"
+```
+
+No arquivo `android/app/build.gradle.kts`, confira se o `minSdk` está configurado como 23.
+
+Depois, execute na pasta principal:
+
+```bash
+flutter build apk --release
+```
+
+O arquivo será gerado em:
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+Para utilizar o aplicativo no celular, basta instalar o APK.
+
+**Conexão com o servidor pelo celular:**
+
+O computador e o celular precisam estar conectados à mesma rede Wi-Fi. Com o servidor ligado, abra o aplicativo, toque nos três pontinhos do menu e selecione **Endereço do servidor**.
+
+Informe o endereço IP do computador, exibido no terminal do servidor, no seguinte formato:
+
+```text
+http://IP_DO_COMPUTADOR:8000
+```
+
+No emulador Android, o endereço de conexão já funciona automaticamente.
 
 ---
 
-## 📲 Gerar e instalar o APK
+# 🫐 Sobre o projeto
 
-1. Em `android/app/src/main/AndroidManifest.xml`, confirme:
-   - antes de `<application`: `<uses-permission android:name="android.permission.INTERNET"/>`
-   - dentro da tag `<application`: `android:usesCleartextTraffic="true"`
-2. Em `android/app/build.gradle.kts`, confirme `minSdk = 23`.
-3. Gere o arquivo:
-   ```
-   flutter build apk --release
-   ```
-   O APK fica em `build/app/outputs/flutter-apk/app-release.apk`.
-4. Instale no celular (copie o arquivo e abra, ou use `adb install app-release.apk`).
-5. Com o servidor ligado no computador e os dois na **mesma rede Wi-Fi**, abra o app, toque nos três pontinhos →
-   **Endereço do servidor** e informe `http://IP_DO_COMPUTADOR:8000` (o IP aparece no terminal do servidor).
-   No emulador Android o endereço já funciona automaticamente.
+A **Amora Bakery** foi pensada para representar uma padaria e cafeteria que deseja oferecer uma experiência mais prática aos seus clientes.
+
+Pelo aplicativo, é possível consultar os produtos disponíveis, visualizar preços e promoções, adicionar itens aos favoritos e montar um carrinho de compras.
+
+Na finalização do pedido, o cliente pode escolher entre receber os produtos em casa ou retirar diretamente no balcão da padaria.
+
+O projeto também conta com uma área administrativa, que permite controlar o cardápio e acompanhar os pedidos realizados pelos clientes.
+
+## 👤 Funcionalidades do cliente
+
+- Criar uma conta e realizar login.
+- Manter a sessão salva no aparelho, sem precisar entrar novamente toda vez que abrir o aplicativo.
+- Consultar o cardápio e visualizar os produtos disponíveis.
+- Pesquisar produtos pelo nome.
+- Filtrar os produtos por categoria: pães, doces e bebidas.
+- Adicionar produtos aos favoritos.
+- Adicionar itens ao carrinho e alterar suas quantidades.
+- Visualizar o valor total da compra.
+- Escolher entre entrega ou retirada no balcão.
+- Informar o endereço de entrega, com preenchimento automático dos dados por meio do CEP.
+- Consultar seus pedidos anteriores e acompanhar o andamento de cada um.
+- Consultar o cardápio mesmo sem conexão com a internet, utilizando os dados armazenados em cache.
+
+## 🛠️ Funcionalidades do administrador
+
+O administrador possui acesso a funcionalidades específicas para gerenciar a padaria.
+
+- Cadastrar novos produtos.
+- Editar informações de produtos já cadastrados.
+- Excluir produtos do cardápio.
+- Informar nome, categoria, preço, descrição e promoção.
+- Adicionar fotos aos produtos utilizando a galeria, câmera ou um link de imagem.
+- Consultar todos os pedidos realizados pelos clientes.
+- Visualizar os dados de quem realizou cada pedido, incluindo nome, telefone e e-mail.
+- Consultar os itens, quantidades, tipo de pedido e endereço de entrega, quando aplicável.
+- Atualizar o status dos pedidos.
+
+Os pedidos podem passar pelos seguintes status:
+
+1. Novo;
+2. Preparando;
+3. Pronto;
+4. Entregue;
+5. Cancelado.
 
 ---
 
-## 🌐 API REST
+# 🧱 Tecnologias utilizadas
 
-Dados públicos (produtos) ficam no banco externo e são acessados por serviços RESTful.
-Rotas protegidas exigem o cabeçalho `Authorization: Bearer <token>` recebido no login.
+Para desenvolver o projeto, foram utilizadas as seguintes tecnologias:
 
-| Método | Rota | Quem acessa | Descrição |
+| Parte do projeto | Tecnologia |
+|---|---|
+| Aplicativo mobile | Flutter e Dart |
+| Servidor | Python 3 |
+| API | API REST desenvolvida em Python |
+| Banco de dados | SQLite |
+| Armazenamento local | Shared Preferences e Flutter Secure Storage |
+| Requisições HTTP | HTTP |
+| Seleção de imagens | Image Picker |
+| Consulta de CEP | ViaCEP |
+
+O servidor foi desenvolvido utilizando apenas bibliotecas da própria linguagem Python, sem a necessidade de instalar frameworks adicionais para o backend.
+
+## 📁 Organização das pastas
+
+O projeto foi organizado para separar as telas, os modelos, os serviços e os componentes utilizados pelo aplicativo.
+
+```text
+padaria/
+│
+├── backend/
+│   └── server.py
+│
+├── lib/
+│   ├── main.dart
+│   ├── theme.dart
+│   │
+│   ├── models/
+│   │
+│   ├── services/
+│   │
+│   ├── screens/
+│   │
+│   └── widgets/
+│
+├── assets/
+│   └── logo.png
+│
+├── android/
+├── web/
+│
+└── pubspec.yaml
+```
+
+**O que cada pasta contém:**
+
+- `backend/`: contém o servidor responsável pela API e pelo banco de dados.
+- `models/`: reúne as classes utilizadas para representar produtos, usuários, pedidos e carrinho.
+- `services/`: concentra os serviços de comunicação com a API, armazenamento local, carrinho e consulta de CEP.
+- `screens/`: contém as telas do aplicativo, como login, cardápio, detalhes dos produtos, carrinho e pedidos.
+- `widgets/`: reúne componentes reutilizáveis utilizados em diferentes partes do aplicativo.
+- `assets/`: armazena os arquivos visuais, incluindo a logo da Amora Bakery.
+
+---
+
+# 🌐 API e banco de dados
+
+O projeto utiliza uma API REST própria para realizar a comunicação entre o aplicativo e o servidor.
+
+Os dados dos produtos, usuários e pedidos são armazenados no banco SQLite, localizado em `backend/padaria.db`.
+
+A API também é responsável por verificar as permissões de acesso, processar os pedidos e recalcular os preços no servidor antes de registrar uma compra.
+
+### Principais rotas da API
+
+| Método | Rota | Acesso | Função |
 |---|---|---|---|
-| POST | `/auth/registro` | público | Cria conta de cliente |
-| POST | `/auth/login` | público | Entra e recebe o token |
-| **GET** | `/produtos` | público | Lista os produtos |
-| **POST** | `/produtos` | admin | Cria produto |
-| **PUT** | `/produtos/{id}` | admin | Atualiza produto |
-| **DELETE** | `/produtos/{id}` | admin | Exclui produto |
-| POST | `/pedidos` | logado | Cria pedido (o preço é recalculado no servidor) |
-| GET | `/pedidos` | logado | Admin: todos os pedidos · Cliente: apenas os seus |
-| PUT | `/pedidos/{id}/status` | admin | Altera o status do pedido |
+| POST | `/auth/registro` | Público | Cadastro de clientes |
+| POST | `/auth/login` | Público | Login e geração de token |
+| GET | `/produtos` | Público | Consultar produtos |
+| POST | `/produtos` | Administrador | Cadastrar produto |
+| PUT | `/produtos/{id}` | Administrador | Editar produto |
+| DELETE | `/produtos/{id}` | Administrador | Excluir produto |
+| POST | `/pedidos` | Usuário logado | Criar pedido |
+| GET | `/pedidos` | Usuário logado | Consultar pedidos |
+| PUT | `/pedidos/{id}/status` | Administrador | Atualizar status |
+
+As rotas protegidas exigem um token de autenticação enviado no cabeçalho da requisição:
+
+```text
+Authorization: Bearer <token>
+```
+
+Além da API própria, o aplicativo utiliza o serviço ViaCEP para consultar os dados de endereço a partir do CEP informado pelo cliente.
 
 ---
 
-## 🔐 Dados públicos x dados sensíveis
+# 🔐 Armazenamento e proteção dos dados
 
-| Tipo | Exemplos | Onde fica |
-|---|---|---|
-| **Público** | produtos, preços, promoções, imagens | Banco externo (SQLite) via API REST |
-| **Sensível** | sessão/token do usuário e endereço de entrega salvo | **Somente no aparelho**, em armazenamento seguro (`flutter_secure_storage`) |
-| Local (não sensível) | cache dos produtos e favoritos | `shared_preferences` |
+O projeto utiliza diferentes formas de armazenamento, dependendo do tipo de informação.
 
-Observações: a senha é guardada no servidor apenas como **hash** (PBKDF2 com sal), nunca em texto puro.
-O endereço só é enviado ao servidor dentro de um pedido de **entrega**, pois é necessário para entregar.
-
----
-
-## ✅ Critérios da avaliação × onde estão no projeto
-
-| Capacidade / Critério | Atendimento |
+| Tipo de informação | Onde é armazenada |
 |---|---|
-| **2. Ambiente de desenvolvimento** | Variáveis de ambiente do Windows (Flutter `bin` no `Path`, `ANDROID_HOME`, `JAVA_HOME`); IDE VS Code; plugins Flutter e Dart; bibliotecas importadas no `pubspec.yaml` (`http`, `shared_preferences`, `flutter_secure_storage`, `image_picker`) |
-| **3. Requisitos → componentes** | Tabela abaixo |
-| **4. Variáveis, processos e saídas** | Tipos `int`, `double`, `String`, `bool`, `List`, `Map`, `Set` (`models/`); processos: cálculo de promoção (10%) e total do carrinho, validações de formulário, busca e filtro por categoria; saídas: telas, pedidos e status. Adicionais: favoritos, foto do produto, busca de CEP, status do pedido |
-| **5. Interfaces móveis** | 6 telas (mínimo exigido: 3): login, cardápio, detalhe, formulário de produto, carrinho/checkout e pedidos. Responsividade: grade com `SliverGridDelegateWithMaxCrossAxisExtent` (colunas se adaptam à largura), `ConstrainedBox`, `Wrap` no rodapé |
-| **6. Lógica em Dart** | `async/await` e `Future`, null safety (`int?`, `String?`), construtores `factory`, parâmetros `super.`, `switch` com expressões e *records* |
-| **7. Persistência local** | `services/local_storage.dart`: cache dos produtos (funciona offline), favoritos, sessão e endereço salvos no aparelho |
-| **8. Integração com serviços web** | `services/api_service.dart`: **GET, POST, PUT e DELETE**; múltiplas APIs: API própria + **ViaCEP** (`services/cep_service.dart`) |
-| **10. Publicação** | Exportação do APK e instalação no dispositivo (seção acima) |
-| **11. Programação orientada a objetos** | Classes (`Produto`, `Usuario`, `Pedido`, `Carrinho`); subclasses: `Pao`/`Doce`/`Bebida` e `Cliente`/`Administrador` (polimorfismo em `detalhe` e `icone`); componentização com widgets reutilizáveis (`ProdutoCard`, `ProdutoImagem`, `Rodape`, `AmoraLogo`, `AvisoOffline`) |
+| Produtos, preços e promoções | Banco SQLite no servidor |
+| Pedidos e dados dos usuários | Banco SQLite no servidor |
+| Sessão e token de autenticação | Armazenamento seguro no aparelho |
+| Endereço salvo pelo usuário | Armazenamento seguro no aparelho |
+| Cache dos produtos | Shared Preferences |
+| Produtos favoritos | Shared Preferences |
 
-### Requisitos do cliente → componentes do app
+As senhas dos usuários são armazenadas no servidor em formato de hash, utilizando PBKDF2 com salt, em vez de serem salvas como texto comum.
 
-| Requisito do estabelecimento | Componente |
-|---|---|
-| Apresentar produtos, serviços e promoções | `HomeScreen` + `ProdutoCard` + `DetalheScreen` |
-| Interação do usuário | Favoritos, busca, filtros, carrinho e pedidos |
-| Cliente compra e escolhe entrega ou retirada | `CarrinhoScreen` + `Carrinho` |
-| Administrador gerencia produtos | `ProdutoFormScreen` + `ApiService` (POST/PUT/DELETE) |
-| Administrador vê os pedidos e quem os fez | `PedidosScreen` (visão do admin) |
-| Dados sensíveis protegidos no aparelho | `LocalStorage` (`flutter_secure_storage`) |
-| Dados públicos em banco externo via REST | `backend/server.py` + `ApiService` |
-| Funcionar sem internet | Cache de produtos + `AvisoOffline` |
-| Dois perfis de acesso | `LoginScreen` + `Usuario` (`Cliente` / `Administrador`) |
+O endereço de entrega é enviado ao servidor somente quando necessário para registrar um pedido de entrega.
 
 ---
 
-## 🧰 Problemas comuns
+# 📚 Desenvolvimento e requisitos da avaliação
 
-| Problema | Solução |
+Durante o desenvolvimento, foram aplicados diferentes conceitos trabalhados nas aulas de PPDM.
+
+Abaixo estão alguns dos principais critérios da avaliação e como foram utilizados no projeto.
+
+| Critério | Como foi aplicado |
 |---|---|
-| A logo não aparece (só bolinhas roxas) | Confirme que `assets/logo.png` existe e que o `pubspec.yaml` tem `assets:` com `- assets/logo.png`; rode `flutter clean`, `flutter pub get` e abra o app de novo |
-| Erro `image_picker` não encontrado | `flutter pub add image_picker` |
-| "Não foi possível conectar ao servidor" | Confirme que o `server.py` está rodando; no celular, ajuste o endereço do servidor no menu (⋮) |
-| Celular não conecta ao PC | Mesma rede Wi-Fi e firewall do Windows liberando o Python |
-| Login do admin não funciona | Apague `backend/padaria.db` e inicie o servidor de novo |
+| **2. Ambiente de desenvolvimento** | Configuração do Flutter SDK, variáveis de ambiente, VS Code e extensões Flutter e Dart. |
+| **3. Requisitos e componentes** | Organização das funcionalidades em telas, serviços, modelos e widgets. |
+| **4. Variáveis, processos e saídas** | Utilização de tipos como `int`, `double`, `String`, `bool`, `List`, `Map` e `Set`, além de cálculos, filtros e validações. |
+| **5. Interfaces móveis** | Desenvolvimento das telas com layouts responsivos e adaptação dos elementos conforme o tamanho da tela. |
+| **6. Lógica em Dart** | Utilização de `async/await`, `Future`, null safety, construtores `factory`, `switch` e records. |
+| **7. Persistência local** | Armazenamento da sessão, favoritos e cache dos produtos no aparelho. |
+| **8. Integração com serviços web** | Comunicação com a API própria utilizando GET, POST, PUT e DELETE, além da integração com o ViaCEP. |
+| **10. Publicação** | Geração do APK para instalação em dispositivos Android. |
+| **11. Programação orientada a objetos** | Criação de classes, herança, polimorfismo e utilização de componentes reutilizáveis. |
+
+### Programação orientada a objetos
+
+Foram criadas classes para organizar as principais entidades do sistema:
+
+- `Produto`: representação dos produtos da padaria.
+- `Pao`, `Doce` e `Bebida`: subclasses de Produto.
+- `Usuario`: classe base para os usuários.
+- `Cliente` e `Administrador`: subclasses de Usuario.
+- `Pedido`: representação dos pedidos realizados.
+- `Carrinho`: responsável por organizar os itens selecionados e calcular os valores.
+
+Também foram criados widgets reutilizáveis, como `ProdutoCard`, `ProdutoImagem`, `Rodape`, `AmoraLogo` e `AvisoOffline`.
 
 ---
 
-## 👩‍💻 Autoria
+# ⚠️ Problemas comuns
 
-Projeto desenvolvido para a Avaliação Somativa PPDM — Gabriella esturrari 3DSMB20 — SENAI "Roberto Mange".
+| Problema | O que verificar |
+|---|---|
+| A logo não aparece | Confira se `assets/logo.png` existe e está declarado no `pubspec.yaml`. Depois execute `flutter clean` e `flutter pub get`. |
+| Erro relacionado ao `image_picker` | Execute `flutter pub add image_picker`. |
+| O aplicativo não consegue conectar ao servidor | Verifique se o `server.py` está em execução e se o endereço configurado está correto. |
+| O celular não consegue acessar o servidor | Confira se os dois dispositivos estão na mesma rede Wi-Fi e se o firewall permite a conexão com o Python. |
+| O login do administrador não funciona | Confira se o banco foi criado corretamente e se as credenciais estão corretas. |
+
+---
+
+# 👩‍💻 Autoria
+
+Projeto desenvolvido por **Gabriella Esturrari — 3DSMB20**, para a Avaliação Somativa de PPDM do SENAI "Roberto Mange".
+
+**Amora Bakery — Um toque de carinho em cada pedido.** 🫐
