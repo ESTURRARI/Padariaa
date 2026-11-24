@@ -228,8 +228,8 @@ padaria/
 **O que cada pasta contém:**
 
 - `backend/`: contém o servidor responsável pela API e pelo banco de dados.
-- `models/`: reúne as classes utilizadas para representar produtos, usuários, pedidos e carrinho.
-- `services/`: concentra os serviços de comunicação com a API, armazenamento local, carrinho e consulta de CEP.
+- `models/`: reúne as classes utilizadas para representar produtos, usuários e pedidos.
+- `services/`: concentra os serviços de comunicação com a API, armazenamento local, carrinho de compras e consulta de CEP.
 - `screens/`: contém as telas do aplicativo, como login, cardápio, detalhes dos produtos, carrinho e pedidos.
 - `widgets/`: reúne componentes reutilizáveis utilizados em diferentes partes do aplicativo.
 - `assets/`: armazena os arquivos visuais, incluindo a logo da Amora Bakery.
@@ -295,12 +295,12 @@ Abaixo estão alguns dos principais critérios da avaliação e como foram utili
 
 | Critério | Como foi aplicado |
 |---|---|
-| **2. Ambiente de desenvolvimento** | Configuração do Flutter SDK, variáveis de ambiente, VS Code e extensões Flutter e Dart. |
-| **3. Requisitos e componentes** | Organização das funcionalidades em telas, serviços, modelos e widgets. |
+| **2. Ambiente de desenvolvimento** | Configuração do Flutter SDK e das variáveis de ambiente do Windows, instalação do VS Code, das extensões Flutter e Dart (plugins de comunicação) e importação das bibliotecas `http`, `shared_preferences`, `flutter_secure_storage` e `image_picker` no `pubspec.yaml`. |
+| **3. Requisitos e componentes** | Cada requisito do cliente foi relacionado a um componente do aplicativo (veja a tabela **Requisitos do cliente → componentes do app**, mais abaixo). |
 | **4. Variáveis, processos e saídas** | Utilização de tipos como `int`, `double`, `String`, `bool`, `List`, `Map` e `Set`, além de cálculos, filtros e validações. |
 | **5. Interfaces móveis** | Desenvolvimento das telas com layouts responsivos e adaptação dos elementos conforme o tamanho da tela. |
-| **6. Lógica em Dart** | Utilização de `async/await`, `Future`, null safety, construtores `factory`, `switch` e records. |
-| **7. Persistência local** | Armazenamento da sessão, favoritos e cache dos produtos no aparelho. |
+| **6. Lógica em Dart** | Utilização de `async/await`, `Future`, null safety, construtores `factory`, `switch` e records. As diferenças em relação a outras linguagens estão na seção **Características do Dart** (mais abaixo). |
+| **7. Persistência local** | Cache dos produtos e favoritos em `shared_preferences`; sessão e endereço salvos no armazenamento seguro do aparelho (`flutter_secure_storage`). |
 | **8. Integração com serviços web** | Comunicação com a API própria utilizando GET, POST, PUT e DELETE, além da integração com o ViaCEP. |
 | **10. Publicação** | Geração do APK para instalação em dispositivos Android. |
 | **11. Programação orientada a objetos** | Criação de classes, herança, polimorfismo e utilização de componentes reutilizáveis. |
@@ -317,6 +317,33 @@ Foram criadas classes para organizar as principais entidades do sistema:
 - `Carrinho`: responsável por organizar os itens selecionados e calcular os valores.
 
 Também foram criados widgets reutilizáveis, como `ProdutoCard`, `ProdutoImagem`, `Rodape`, `AmoraLogo` e `AvisoOffline`.
+
+### Requisitos do cliente → componentes do app
+
+| Requisito do estabelecimento | Componente do aplicativo |
+|---|---|
+| Apresentar produtos, serviços e promoções | `HomeScreen` + `ProdutoCard` + `DetalheScreen` |
+| Interação do usuário | Favoritos, busca, filtros por categoria, carrinho e pedidos |
+| Cliente compra e escolhe entrega ou retirada | `CarrinhoScreen` + `Carrinho` |
+| Administrador gerencia os produtos | `ProdutoFormScreen` + `ApiService` (POST, PUT e DELETE) |
+| Administrador vê os pedidos e quem os fez | `PedidosScreen` (visão do administrador) |
+| Dados sensíveis protegidos no aparelho | `LocalStorage` (`flutter_secure_storage`) |
+| Dados públicos em banco externo via REST | `backend/server.py` + `ApiService` |
+| Funcionar sem internet | Cache de produtos + `AvisoOffline` |
+| Dois perfis de acesso | `LoginScreen` + `Usuario` (`Cliente` e `Administrador`) |
+
+### Características do Dart em relação a outras linguagens
+
+| Característica | Como aparece no projeto | Diferença para outras linguagens |
+|---|---|---|
+| Null safety | `int? id`, `String?`, uso de `!` e `??` | Em JavaScript e Python qualquer variável pode ser nula. No Dart o tipo declara se aceita nulo, evitando erros em tempo de execução. |
+| Tipagem forte | `double preco`, `bool promocao`, `List<Produto>` | JavaScript e Python são dinamicamente tipados. O Dart confere os tipos ao compilar. |
+| `async/await` e `Future` | `Future<List<Produto>> listar() async` | O assíncrono do Dart usa `Future` e um laço de eventos, sem criar threads manualmente como em Java. |
+| Tudo é objeto | Números, textos e funções são objetos | Em Java existem tipos primitivos separados dos objetos. |
+| Classes abstratas e herança | `abstract class Produto` com `Pao`, `Doce` e `Bebida` | Não há `public` ou `private`: a privacidade é feita com `_` no início do nome (ex.: `_carregar`). |
+| Construtores especiais | `factory Produto.fromJson`, parâmetros nomeados com `required`, `super.id` | Em Java e C# os construtores costumam ser mais longos. O Dart tem parâmetros nomeados e `factory`. |
+| `switch` com expressões e records | `'POST' => http.post(...)`, `(valor, rotulo)` | Em linguagens mais antigas o `switch` é só uma instrução e não devolve valor. |
+| Compilação | Hot reload no desenvolvimento e APK compilado | Python é interpretado. O Dart roda com hot reload ao desenvolver e compila para código nativo no APK. |
 
 ---
 
