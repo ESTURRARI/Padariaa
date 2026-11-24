@@ -52,6 +52,14 @@ class LocalStorage {
     return s == null ? {} : Map<String, String>.from(jsonDecode(s));
   }
 
+  // ---- perfil do cliente (nome, telefone e endereço), só no aparelho
+  Future<void> salvarPerfil(Map<String, String> perfil) => _gravar('perfil', jsonEncode(perfil));
+
+  Future<Map<String, String>> lerPerfil() async {
+    final s = await _ler('perfil');
+    return s == null ? {} : Map<String, String>.from(jsonDecode(s));
+  }
+
   // ---- cache local dos produtos (funciona offline)
   Future<void> salvarCache(List<Produto> lista) async {
     final p = await SharedPreferences.getInstance();

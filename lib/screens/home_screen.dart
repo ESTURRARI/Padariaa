@@ -14,6 +14,7 @@ import 'carrinho_screen.dart';
 import 'detalhe_screen.dart';
 import 'login_screen.dart';
 import 'pedidos_screen.dart';
+import 'perfil_screen.dart';
 import 'produto_form_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -124,11 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
           PopupMenuButton<String>(
             onSelected: (v) async {
               if (v == 'sair') return _sair();
+              if (v == 'perfil') return _abrir(const PerfilScreen());
               if (await editarServidor(context)) _carregar();
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'servidor', child: Text('Endereço do servidor')),
-              PopupMenuItem(value: 'sair', child: Text('Sair')),
+            itemBuilder: (_) => [
+              if (!admin) const PopupMenuItem(value: 'perfil', child: Text('Meu perfil')),
+              const PopupMenuItem(value: 'servidor', child: Text('Endereço do servidor')),
+              const PopupMenuItem(value: 'sair', child: Text('Sair')),
             ],
           ),
         ],
